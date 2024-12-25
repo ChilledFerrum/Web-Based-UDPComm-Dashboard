@@ -2,7 +2,7 @@
 | An implementation of a web-based controlled UDP Client Server Communication network written in python.
 
 ###### This project was developed originally as an assignment and later refined to be published as an open-source project in my Github repository. 
-
+![Misc](misc/UDP-CommDashboardThumbnail.JPEG)
 ## Description
 > An implementation of a UDP Client Server communication system used to analyze the traffic between both sides effectively and identify latency spikes. <br><br> The system can be effectively executed in two ways: <br> Manually, by directly executing each individual program in the terminal and passing arguments for both 'udp-server.py' & 'udp-client.py'. <br> Dynamically, using a web-based tool developed using Streamlit that allows the user to begin experiments by setting the preferred parameters of the network and the experiment.
 
