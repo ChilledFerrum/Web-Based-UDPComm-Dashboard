@@ -120,17 +120,10 @@ def server_main(args):
                 if status < 0:
                     break
                 prev_time = prev_time
-                # transf_time = float(data_msg)
-                # total_bytes += len(data_rec)
-                # # OWD_ms = calculate_OWD(transf_time, time_rec)
-                # elapsed_time = (time_rec - start_time) / (10**9)
-                # throughput = (total_bytes * 8) / elapsed_time
-                # throughput_Mbps = throughput /1e6
-
 
             except socket.error as err:
                 throw_error("Error during Communication", error_code=err.errno)
 
 
-# if __name__ == "__main__":
-#     server_main(get_args())
+if __name__ == "__main__":
+    server_main(get_args())

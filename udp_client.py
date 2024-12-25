@@ -176,5 +176,5 @@ def client_main(args):
 
 
 
-# if __name__ == "__main__":
-# client_main(get_args())
+if __name__ == "__main__":
+    client_main(get_args())

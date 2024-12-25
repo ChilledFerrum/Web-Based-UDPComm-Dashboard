@@ -15,11 +15,26 @@
 <span style="font-size: 16px; font-weight: bold;">Method 1: Web-based tool</span> 
 (streamlit)
 ```
+cd Web-Based-UDPComm-Dashboard
 conda create -n client-server-comm-controller python==3.10 -y 
 conda activate client-server-comm-controller
 pip install -r requirements.txt
-cd 
+streamlit run Dashboard-Controller.py
 ```
-<span style="font-size: 16px; font-weight: bold;">Method 2: </span> 
+<span style="font-size: 16px; font-weight: bold;">Method 2: Manually</span> 
+
 ```
+cd Web-Based-UDPComm-Dashboard
+conda create -n client-server-comm-controller python==3.10 -y 
+conda activate client-server-comm-controller
+pip install -r requirements.txt
+```
+Run the Server '*udp-server.py*' on a terminal...
+```
+python udp-server.py --a 127.0.0.1 --p 8080 --i 1
+```
+
+Run the client '*udp-cliet.py*' on a new terminal...
+```
+python udp-client.py --a 127.0.0.1 --p 8080 --i 1 --t 10
 ```

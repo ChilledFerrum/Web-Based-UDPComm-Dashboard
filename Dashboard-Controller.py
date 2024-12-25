@@ -22,7 +22,7 @@ class DashboardController:
             "Time": []
         }
 
-        self.results.log = {
+        self.results_log = {
             "Throughput": [],
             "Jitter Client": [],
             "Jitter Server": [],
@@ -66,10 +66,9 @@ class DashboardController:
 
         with col2:
             st.header("Live Metrics 📈")
-            self.col2 = col2  # Save reference to col2 for charts
-
+            self.col2 = col2 
+            
     def create_chart_placeholders(self):
-        """Create chart placeholders in col2."""
         with self.col2:
             throughput_chart = st.empty()
             jitter_chart = st.empty()
@@ -83,32 +82,33 @@ class DashboardController:
         }
 
     def start_experiment(self):
-        """Run the experiment, update charts, and reset results after completion."""
+        """ Start experiments by running the website, client and server programs simultaneously using threads.
+            Effective for tasks that require multitasking such as the Server that listens for requests...
+            and the client that communicates with the server.
+            Additionally with the use of a looped web-based program such as streamlit.
+        """
         self.reset_log_results()
 
-        # Start server and client threads
+        # Start server and client as threads
         server_thread = threading.Thread(target=self.start_server, daemon=True)
         client_thread = threading.Thread(target=self.start_client, daemon=True)
         server_thread.start()
-        time.sleep(1)  # Allow server to initialize
+        time.sleep(1)  # Time for the server to initiate
         client_thread.start()
 
-        # Update charts dynamically during the experiment
         for _ in range(self.experiment_duration):
             self.update_charts()
             time.sleep(1)
 
-        # Save charts to figures folder before resetting
         self.save_charts()
 
-        # Reset for the next experiment
         self.reset_log_results()
 
     def save_charts(self):
-        """Save the charts as .jpg files with X/Y labels, legends, and custom colors."""
         os.makedirs("figures", exist_ok=True)
-        time_axis = self.results.log["Time"]
+        time_axis = self.results_log["Time"]
 
+        # Nested Function to store the plots individually...
         def plot_and_save_chart(data, labels, filename, xlabel, ylabel, title):
             plt.figure(figsize=(10, 6))
             for series, label, color in zip(data, labels, ["lightblue", "lightcoral"]):
@@ -123,9 +123,9 @@ class DashboardController:
             plt.close()
 
         # Throughput chart
-        if self.results.log["Throughput"]:
+        if self.results_log["Throughput"]:
             plot_and_save_chart(
-                [self.results.log["Throughput"]],
+                [self.results_log["Throughput"]],
                 ["Throughput (Mbps)"],
                 "throughput_chart",
                 "Time (s)",
@@ -134,9 +134,9 @@ class DashboardController:
             )
 
         # Jitter chart
-        if self.results.log["Jitter Client"] and self.results.log["Jitter Server"]:
+        if self.results_log["Jitter Client"] and self.results_log["Jitter Server"]:
             plot_and_save_chart(
-                [self.results.log["Jitter Client"], self.results.log["Jitter Server"]],
+                [self.results_log["Jitter Client"], self.results_log["Jitter Server"]],
                 ["Jitter Client (ms)", "Jitter Server (ms)"],
                 "jitter_chart",
                 "Time (s)",
@@ -145,9 +145,9 @@ class DashboardController:
             )
 
         # OWD chart
-        if self.results.log["OWD Client"] and self.results.log["OWD Server"]:
+        if self.results_log["OWD Client"] and self.results_log["OWD Server"]:
             plot_and_save_chart(
-                [self.results.log["OWD Client"], self.results.log["OWD Server"]],
+                [self.results_log["OWD Client"], self.results_log["OWD Server"]],
                 ["OWD Client (ms)", "OWD Server (ms)"],
                 "owd_chart",
                 "Time (s)",
@@ -156,9 +156,9 @@ class DashboardController:
             )
 
         # Tail Latency chart
-        if self.results.log["Tail Latency Client"] and self.results.log["Tail Latency Server"]:
+        if self.results_log["Tail Latency Client"] and self.results_log["Tail Latency Server"]:
             plot_and_save_chart(
-                [self.results.log["Tail Latency Client"], self.results.log["Tail Latency Server"]],
+                [self.results_log["Tail Latency Client"], self.results_log["Tail Latency Server"]],
                 ["Tail Latency Client (ms)", "Tail Latency Server (ms)"],
                 "tail_latency_chart",
                 "Time (s)",
@@ -167,41 +167,41 @@ class DashboardController:
             )
 
     def update_charts(self):
-        """Update charts with the latest data."""
+        """Update charts with the latest data"""
         results = udp_client.results_log
 
         if results["Time"]:
             time_axis = results["Time"]
 
             # Update persistent log
-            for key in self.results.log.keys():
-                self.results.log[key] = results[key]  # Copy results to persistent log
+            for key in self.results_log.keys():
+                self.results_log[key] = results[key]
 
             # Update throughput chart
             if len(results["Throughput"]) == len(time_axis):
                 self.chart_placeholders["Throughput"].line_chart(
-                    {"Throughput (Mbps)": self.results.log["Throughput"]}, use_container_width=True
+                    {"Throughput (Mbps)": self.results_log["Throughput"]}, use_container_width=True
                 )
 
             # Update jitter chart
             if len(results["Jitter Client"]) == len(time_axis) and len(results["Jitter Server"]) == len(time_axis):
                 self.chart_placeholders["Jitter"].line_chart({
-                    "Jitter Client (ms)": self.results.log["Jitter Client"],
-                    "Jitter Server (ms)": self.results.log["Jitter Server"]
+                    "Jitter Client (ms)": self.results_log["Jitter Client"],
+                    "Jitter Server (ms)": self.results_log["Jitter Server"]
                 }, use_container_width=True)
 
             # Update OWD chart
             if len(results["OWD Client"]) == len(time_axis) and len(results["OWD Server"]) == len(time_axis):
                 self.chart_placeholders["OWD"].line_chart({
-                    "OWD Client (ms)": self.results.log["OWD Client"],
-                    "OWD Server (ms)": self.results.log["OWD Server"]
+                    "OWD Client (ms)": self.results_log["OWD Client"],
+                    "OWD Server (ms)": self.results_log["OWD Server"]
                 }, use_container_width=True)
 
             # Update tail latency chart
             if len(results["Tail Latency Client"]) == len(time_axis) and len(results["Tail Latency Server"]) == len(time_axis):
                 self.chart_placeholders["Tail Latency"].line_chart({
-                    "Tail Latency Client (ms)": self.results.log["Tail Latency Client"],
-                    "Tail Latency Server (ms)": self.results.log["Tail Latency Server"]
+                    "Tail Latency Client (ms)": self.results_log["Tail Latency Client"],
+                    "Tail Latency Server (ms)": self.results_log["Tail Latency Server"]
                 }, use_container_width=True)
 
     def reset_log_results(self):
@@ -219,13 +219,11 @@ class DashboardController:
         udp_client.results_log = self.results_log  # Reset client log results
 
     def start_server(self):
-        """Start the UDP server."""
         args_server.a = self.server_ip
         args_server.p = self.server_port
         udp_server.server_main(args_server)
 
     def start_client(self):
-        """Start the UDP client."""
         args_client.a = self.client_ip
         args_client.p = self.client_port
         args_client.i = self.experiment_interval_client
